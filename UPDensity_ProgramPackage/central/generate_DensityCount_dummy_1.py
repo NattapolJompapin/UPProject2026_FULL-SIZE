@@ -15,8 +15,8 @@ DB_CONFIG = {
 
 CAMERAS = ["CAM01", "CAM02", "CAM03", "CAM04"]
 
-START_TIME = datetime(2026, 3, 1, 7, 0, 0)
-END_TIME   = datetime(2026, 3, 14, 22, 0, 0)
+START_TIME = datetime(2026, 9, 1, 7, 0, 0)
+END_TIME   = datetime(2026, 9, 10, 9, 0, 0)
 
 # -------------------------
 # ช่วงเวลาหนาแน่น
@@ -24,11 +24,11 @@ END_TIME   = datetime(2026, 3, 14, 22, 0, 0)
 CAM_PEAK_TIMES = {
     "CAM01": ["07:30", "10:00", "13:00", "15:30"],
     "CAM02": ["07:00", "10:00", "13:30", "15:30", "16:30"],
-    "CAM03": ["08:00", "10:00", "13:00", "15:00", "17:00"],
-    "CAM04": ["11:00", "13:30", "15:30", "17:30", "18:30"]
+    "CAM03": ["10:00", "13:00", "15:00", "17:00"],
+    "CAM04": ["07:30","11:00", "13:30", "15:30", "17:30", "18:30"]
 }
 
-PEAK_WINDOW_MIN = 15
+PEAK_WINDOW_MIN = 25
 ZERO_UNTIL = {cam: None for cam in CAMERAS}
 
 # -------------------------
@@ -53,7 +53,7 @@ def get_daily_factor(date):
         base *= 0.5
 
     elif event > 0.9: # 10% วันคนเยอะ
-        base *= 1.5
+        base *= 1.8
 
     return base
 
@@ -86,33 +86,117 @@ def generate_passenger_count(camera_id, current_time, factor):
     global ZERO_UNTIL
 
     # -----------------------
-    # ถ้ายังอยู่ในช่วง zero
+    # Zero period
     # -----------------------
-    if ZERO_UNTIL[camera_id] and current_time < ZERO_UNTIL[camera_id]:
+    if (
+        ZERO_UNTIL[camera_id]
+        and current_time < ZERO_UNTIL[camera_id]
+    ):
         return 0
 
     # -----------------------
-    # สุ่มเริ่มช่วง zero ใหม่
+    # สุ่มช่วง Zero
     # -----------------------
-    if random.random() < 0.02:  # โอกาส 2%
-        duration = random.randint(1,4)  # 1-4 นาที
-        ZERO_UNTIL[camera_id] = current_time + timedelta(minutes=duration)
+    if random.random() < 0.01:
+
+        duration = random.randint(1, 3)
+
+        ZERO_UNTIL[camera_id] = (
+            current_time +
+            timedelta(minutes=duration)
+        )
+
         return 0
 
     hour = current_time.hour
 
-    if hour < 8 or hour >= 21:
-        base = random.randint(0,5)
+    # =====================================================
+    # PKY / CAM04 : 07:00 - 08:00
+    # คนเยอะมากเป็นพิเศษ
+    # =====================================================
 
-    elif is_peak_time(camera_id, current_time):
-        base = random.randint(25,54)
+    if (
+        camera_id == "CAM04"
+        and 7 <= hour < 8
+    ):
+        base = random.randint(23,45)
+        value = int(
+            base * (0.9 + factor * 0.1)
+        )
+        return max(45,min(85, value))
+
+    # =====================================================
+    # 18:00 - 22:00 คนเริ่มน้อยลง
+    # =====================================================
+
+    if 18 <= hour < 22:
+
+        base = random.randint(5, 12)
+
+        value = int(base * factor)
+
+        return max(
+            5,
+            min(15, value)
+        )
+
+    # =====================================================
+    # กลางคืน 22:00 เป็นต้นไป
+    # =====================================================
+
+    elif hour >= 22 or hour < 8:
+
+        base = random.randint(2, 8)
+
+        value = int(base * factor)
+
+        return max(
+            2,
+            min(10, value)
+        )
+
+    # =====================================================
+    # PEAK TIME
+    # =====================================================
+
+    elif is_peak_time(
+        camera_id,
+        current_time
+    ):
+
+        base = random.randint(
+            35,
+            65
+        )
+
+        value = int(
+            base * (0.85 + factor * 0.15)
+        )
+
+        return max(
+            30,
+            min(70, value)
+        )
+
+    # =====================================================
+    # NORMAL TIME
+    # =====================================================
 
     else:
-        base = random.randint(5,20)
 
-    value = int(base * factor)
+        base = random.randint(
+            15,
+            27
+        )
 
-    return max(0,value)
+        value = int(
+            base * factor
+        )
+
+        return max(
+            15,
+            min(27, value)
+        )
 
 
 # -------------------------
@@ -127,13 +211,23 @@ def main():
 
     print("✅ Connected")
 
-    cursor.execute("TRUNCATE TABLE DensityCount")
-    conn.commit()
 
     rows = []
 
     current_time = START_TIME
-    dc_num = 1
+    # หา DensityCount_ID ล่าสุดที่มีอยู่
+    cursor.execute("""
+        SELECT MAX(CAST(SUBSTRING(DensityCount_ID, 3) AS UNSIGNED))
+        FROM DensityCount
+        WHERE DensityCount_ID LIKE 'DC%'
+    """)
+
+    result = cursor.fetchone()
+
+    if result[0] is None:
+        dc_num = 1
+    else:
+        dc_num = result[0] + 1
 
     current_day = None
     daily_factor = 1

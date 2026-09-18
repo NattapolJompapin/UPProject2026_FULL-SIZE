@@ -1,0 +1,72 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "1. Start JS Server",
+            "type": "shell",
+            "command": "node server.js",
+            "options": {
+                "cwd": "${workspaceFolder}/JSServer"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "panel": "dedicated",
+                "group": "js-server"
+            },
+            "isBackground": true
+        },
+        {
+            "label": "2. Start React Dashboard",
+            "type": "shell",
+            "command": "npm start",
+            "options": {
+                "cwd": "${workspaceFolder}/Dashboard React"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "panel": "dedicated",
+                "group": "react-dashboard"
+            },
+            "isBackground": true
+        },
+        {
+            "label": "3. Start Central API",
+            "type": "shell",
+            "command": "\"${workspaceFolder}/UPDensity_ProgramPackage/venv/Scripts/python.exe\" -m uvicorn main:app --host 0.0.0.0 --port 3001",
+            "options": {
+                "cwd": "${workspaceFolder}/UPDensity_ProgramPackage/central"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "panel": "dedicated",
+                "group": "central-api"
+            },
+            "isBackground": true
+        },
+        {
+            "label": "4. Start Edge Multi",
+            "type": "shell",
+            "command": "\"${workspaceFolder}/UPDensity_ProgramPackage/venv/Scripts/python.exe\" edge_multi.py",
+            "options": {
+                "cwd": "${workspaceFolder}/UPDensity_ProgramPackage/edge"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "panel": "dedicated",
+                "group": "edge-multi"
+            },
+            "isBackground": true
+        },
+        {
+            "label": "Start All Services",
+            "dependsOn": [
+                "1. Start JS Server",
+                "2. Start React Dashboard",
+                "3. Start Central API",
+                "4. Start Edge Multi"
+            ],
+            "dependsOrder": "parallel",
+            "problemMatcher": []
+        }
+    ]
+}

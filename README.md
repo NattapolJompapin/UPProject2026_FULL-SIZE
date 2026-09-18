@@ -11,8 +11,17 @@ git push
 # สร้าง Docker Container ผ่าน /docker-compose.yml
 docker-compose up -d
 
+
+
+
+
+
+
+
+
+
 # --------------------
-# Command เปิดระบบ
+# Command Run เปิดระบบ
 
 # เซิฟเวอร์
 cd JSServer

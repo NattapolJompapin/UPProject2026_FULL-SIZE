@@ -96,28 +96,6 @@ project-root/
 
 ---
 
-## ▶️ Installation & Usage
-
-1. Clone repository
-```bash
-git clone https://github.com/username/project-name.git
-cd project-name
-```
-
-2. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-3. Run the system
-
-```bash
-python src/main.py
-```
-
----
-
 ## ✅ Expected Results
 - ระบบสามารถนับจำนวนผู้โดยสารได้อย่างถูกต้อง
 - แจ้งเตือนความหนาแน่นของผู้โดยสารแบบอัตโนมัติ
