@@ -6,6 +6,11 @@ run with CMD ...
 # ดึงโค้ดจาก Git
 git pull
 
+# ดึงเเบบ "HARD PULL"
+git fetch --all
+git reset --hard origin/main
+git clean -fd
+
 ========================
 # อัพโค้ดขึ้น Git
 git add .
