@@ -15,7 +15,7 @@ REM ---------- 3. Central API (FastAPI) ----------
 start "Central API" cmd /k "cd /d ""%~dp0UPDensity_ProgramPackage"" && call venv\Scripts\activate.bat && cd central && python -m uvicorn main:app --host 0.0.0.0 --port 3001"
 
 REM ---------- 4. Edge Camera ----------
-start "Edge Camera" cmd /k "cd /d ""%~dp0UPDensity_ProgramPackage"" && call venv\Scripts\activate.bat && cd edge && python edge_multi3.py"
+start "Edge Camera" cmd /k "cd /d ""%~dp0UPDensity_ProgramPackage"" && call venv\Scripts\activate.bat && cd edge && python edge_multi0.py"
 
 echo.
 echo ===============================
