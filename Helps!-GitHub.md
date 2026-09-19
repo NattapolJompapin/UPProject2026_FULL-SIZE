@@ -3,17 +3,12 @@
 run with CMD ...
 
 ========================
-# ดึงโค้ดจาก Git
-git pull
+# PULL GIT
+> CMD: git pull
 
-# ดึงเเบบ "HARD PULL"
-git fetch --all
-git reset --hard origin/main
-git clean -fd
+# "HARD PULL" !!!
+> CMD: git reset --hard origin/main && git clean -fd
 
 ========================
-# อัพโค้ดขึ้น Git
-git add .
-git status
-git commit -m "code commit"
-git push
+# PUSH GIT
+> CMD: git add . && git status && git commit -m "code commit" && git push
